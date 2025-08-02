@@ -1,0 +1,25 @@
+{
+  "keywords": [
+    "python",
+    "programming",
+    "AI",
+    "machine learning"
+  ],
+  "regex_patterns": [
+    "\\bcode\\s+review\\b",
+    "\\bhelp\\s+with\\b.*\\b(bug|error|issue)\\b",
+    "\\b(question|ask)\\s+about\\b"
+  ],
+  "llm_api": {
+    "base_url": "http://localhost:1234",
+    "model": "local-model",
+    "system_prompt": "You are a helpful assistant replying to social media posts. Keep responses brief, friendly, and relevant to the original post. Be encouraging and offer helpful insights when appropriate.",
+    "max_tokens": 150,
+    "temperature": 0.7
+  },
+  "reply_settings": {
+    "check_interval": 60,
+    "timeline_limit": 20,
+    "enable_replies": true
+  }
+}
