@@ -1,6 +1,6 @@
 # Operation MISTY JELLYFISH
 
-An agnostic Bluesky reply bot written in Python that automatically responds to posts using AI-generated replies. Fully configurable with custom keywords, regex patterns, and LM Studio integration.
+An agnostic Bluesky reply bot written in Go that automatically responds to posts using AI-generated replies. Fully configurable with custom keywords, regex patterns, and LM Studio integration.
 
 ## Features
 
@@ -14,13 +14,11 @@ An agnostic Bluesky reply bot written in Python that automatically responds to p
 
 ## Quick Start
 
-1. **Clone and setup**
+1. **Clone and build**
    ```bash
    git clone <repository-url>
    cd MISTYJELLYFISH
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -e .
+   go build -o misty-jellyfish ./cmd/misty-jellyfish
    ```
 
 2. **Setup LM Studio**
@@ -43,7 +41,7 @@ An agnostic Bluesky reply bot written in Python that automatically responds to p
 
 5. **Run the bot**
    ```bash
-   python -m misty_jellyfish.main
+   ./misty-jellyfish
    ```
 
 ## Configuration
@@ -59,7 +57,7 @@ BOT_CONFIG_PATH=bot_config.json
 ### Bot Configuration (bot_config.json)
 ```json
 {
-  "keywords": ["python", "programming", "AI"],
+  "keywords": ["golang", "programming", "AI"],
   "regex_patterns": ["\\bcode\\s+review\\b", "\\bhelp\\s+with\\b.*\\b(bug|error)\\b"],
   "llm_api": {
     "base_url": "http://localhost:1234",
@@ -87,20 +85,25 @@ BOT_CONFIG_PATH=bot_config.json
 ## Development
 
 ```bash
-# Install dev dependencies
-pip install -e .[dev]
-
-# Format code
-black misty_jellyfish/
-
-# Lint
-flake8 misty_jellyfish/
-
-# Type check
-mypy misty_jellyfish/
-
 # Run tests
-pytest
+go test ./...
+
+# Build
+go build ./cmd/misty-jellyfish
+
+# Vet / lint
+go vet ./...
+```
+
+## Project Structure
+
+```
+cmd/misty-jellyfish/   # Binary entry point
+internal/
+  bot/                 # Bot logic and AT Protocol API calls
+  config/              # Configuration loading
+bot_config.json        # Bot configuration
+.env.example           # Environment variable template
 ```
 
 ## LM Studio Setup
@@ -118,3 +121,4 @@ pytest
 - Regex validation with error handling
 - Graceful error handling and logging
 - Optional reply disable switch
+
