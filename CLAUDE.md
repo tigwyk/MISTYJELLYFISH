@@ -4,22 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Operation MISTY JELLYFISH is an agnostic Bluesky reply bot written in Python. The bot monitors the Bluesky timeline and automatically replies to posts using AI-generated responses via LM Studio integration. Users can configure custom keywords and regex patterns to target specific posts.
+Operation MISTY JELLYFISH is an agnostic Bluesky reply bot written in Go. The bot monitors the Bluesky timeline and automatically replies to posts using AI-generated responses via LM Studio integration. Users can configure custom keywords and regex patterns to target specific posts.
 
 ## Development Commands
 
 ### Setup
 ```bash
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On macOS/Linux
-# venv\Scripts\activate   # On Windows
+# Ensure Go 1.24+ is installed
+go version
 
-# Install in development mode
-pip install -e .
-
-# Install dev dependencies
-pip install -e .[dev]
+# Download dependencies
+go mod download
 ```
 
 ### Running the Bot
@@ -28,41 +23,44 @@ pip install -e .[dev]
 cp .env.example .env
 # Edit .env with your Bluesky credentials
 
-# Run the bot
-python -m misty_jellyfish.main
-# Or use the installed script
-misty-jellyfish
+# Build and run
+go build -o misty-jellyfish ./cmd/misty-jellyfish
+./misty-jellyfish
+
+# Or run directly
+go run ./cmd/misty-jellyfish
 ```
 
 ### Development Tools
 ```bash
-# Format code
-black misty_jellyfish/
-
-# Lint code  
-flake8 misty_jellyfish/
-
-# Type checking
-mypy misty_jellyfish/
+# Vet (lint)
+go vet ./...
 
 # Run tests
-pytest
+go test ./...
+
+# Run tests with verbose output
+go test -v ./...
+
+# Build
+go build ./...
 ```
 
 ## Architecture
 
 ### Core Components
-- `misty_jellyfish/bot.py`: Main bot implementation with Bluesky API integration
-- `misty_jellyfish/main.py`: Entry point with configuration and signal handling
-- Uses `atproto` library for Bluesky AT Protocol communication
+- `cmd/misty-jellyfish/main.go`: Entry point with configuration and signal handling
+- `internal/bot/bot.go`: Main bot implementation with Bluesky AT Protocol API calls
+- `internal/config/config.go`: Configuration types and loading from bot_config.json
+- Bluesky API calls made directly via `net/http` (no external AT Protocol library required)
 
 ### Bot Behavior
-- Authenticates with Bluesky using handle/password
+- Authenticates with Bluesky using handle/password (AT Protocol createSession)
 - Monitors timeline at configurable intervals (default: 60 seconds)
 - Matches posts using configurable keywords and regex patterns
-- Generates AI replies using LM Studio API
-- Avoids replying to its own posts
-- Graceful shutdown on SIGINT/SIGTERM
+- Generates AI replies using LM Studio API (OpenAI-compatible)
+- Avoids replying to its own posts and to posts that are already replies
+- Graceful shutdown on SIGINT/SIGTERM via signal.NotifyContext
 
 ## Configuration
 
